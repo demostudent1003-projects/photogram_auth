@@ -1,0 +1,6 @@
+<% Like.where(:user_id => current_user.id).each do |like| %>
+    <!-- <%= like.id %> -->
+    <!-- <%= like.photo_id %> -->
+    <img src="<%= like.photo.image %>">
+    <%= like.photo.caption %>
+  <% end %>

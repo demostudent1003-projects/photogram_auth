@@ -1,0 +1,121 @@
+<!-- top button -->
+  
+  <style>
+    /* Only necessary if you are using navbar-fixed-top */
+    body {
+      padding-top: 160px;
+    }
+  </style>
+
+<div class="row">  <div class="col-md-8 col-md-offset-2">
+    <a href="/photos/new" class="btn btn-default btn-block">
+      <i class="fa fa-fw fa-plus"></i>
+      Add Photo
+    </a>
+    <hr>
+  </div>
+</div>
+
+
+<!--- new form --->
+<% @photos.each do |photo| %>
+
+  <!--- header where time goes -->
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            <a href="/users/<%= photo.user.id %>"><%= photo.user.username %></a>
+            <small>
+              <%= time_ago_in_words(photo.created_at) %> ago
+            </small>
+          </h3>
+        </div>
+  
+  <!--- the part under the header where the photo and comments go -->
+  <div class="panel-body">
+      <!--- the actual photo -->
+      <a href="/photos/<%= photo.id %>">
+      <img src="<%= photo.image %>" class="img-responsive">
+        </a>
+      <!--- who likes it -->
+      <div>
+      <small>
+        <% Like.where(:photo_id => photo.id).each do |like| %>
+          <%= like.user.username %> liked this
+        <% end %>
+
+      </small>
+      
+      <!--- like/unlike button -->
+      <a href="/delete_like/581" class="btn btn-link pull-right">
+              <i class="fa fa-fw fa-heart"></i> Unlike
+            </a>
+        </p>
+      
+        <!--- where the comments start -->
+        <% Comment.where(:photo_id => photo.id).each do |comment| %>
+        <ul class="media-list">
+          <li class="media">
+            <div class="media-body">
+              <h6 class="media-heading">
+                <a href="/users/<%= comment.user_id %>"><%= comment.user.username %></a>
+                <small>
+                  <%= time_ago_in_words(comment.created_at) %> ago
+                </small>
+              </h6>
+                <%= comment.body %>
+            </div>
+          </li>
+        <% end %>
+
+        <!-- Show edit/delete buttons -->
+          <% if current_user.id == photo.user_id %>
+          <a href="/photos/<%= photo.id %>/edit" class="btn btn-warning">Edit</a>
+          <a href="/delete_photo/<%= photo.id %>" class="btn btn-danger" rel="nofollow">Delete</a>
+          <% end %>
+          </div>
+          
+          <!-- New comment form -->
+          
+          <li class="media">
+            <div class="media-body">
+              <form action="/create_comment" method="post">
+                <!-- Hidden input for authenticity token to protect from forgery -->
+                <input name="authenticity_token" type="hidden" value="jodjJhCEJYBUS+oM4pBx9cL9fS0quSZDg9jk8XiXWtkFtZ6jG5nsGzolGOw5PJTW+eyvmNgt/BT087NXWC4kTQ==">
+
+                <input type="hidden" name="photo_id" value="<%= photo.id %>">
+
+                <input type="hidden" name="user_id" value="<%= photo.user.id %>">
+
+                <!-- Label and input for body -->
+                <div class="form-group">
+                  <label for="body" class="sr-only">
+                    Body
+                  </label>
+
+                  <div class="input-group">
+                    <input type="text" id="body" name="body" class="form-control" placeholder="Add a comment..." required>
+
+                    <span class="input-group-btn">
+                      <button class="btn btn-primary" type="submit">
+                        <i class="fa fa-fw fa-commenting-o"></i>
+
+                        Add Comment
+                      </button>
+                    </span>
+                  </div><!-- /input-group -->
+                </div>
+              </form>
+            </div>
+          </li>
+        </ul>
+        <div class="btn-group btn-group-justified">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+<% end %>
