@@ -3,7 +3,7 @@
   <style>
     /* Only necessary if you are using navbar-fixed-top */
     body {
-      padding-top: 160px;
+      padding-top: 100px;
     }
   </style>
 
@@ -34,26 +34,39 @@
         </div>
   
   <!--- the part under the header where the photo and comments go -->
-  <div class="panel-body">
-      <!--- the actual photo -->
-      <a href="/photos/<%= photo.id %>">
-      <img src="<%= photo.image %>" class="img-responsive">
-        </a>
-      <!--- who likes it -->
-      <div>
-      <small>
-        <% Like.where(:photo_id => photo.id).each do |like| %>
-          <%= like.user.username %> liked this
-        <% end %>
-
-      </small>
-      
-      <!--- like/unlike button -->
-      <a href="/delete_like/581" class="btn btn-link pull-right">
-              <i class="fa fa-fw fa-heart"></i> Unlike
-            </a>
-        </p>
-      
+        <div class="panel-body">
+            <!--- the actual photo -->
+            <a href="/photos/<%= photo.id %>">
+            <img src="<%= photo.image %>" class="img-responsive">
+              </a>
+              
+       <!--- who likes it -->
+           <% Like.where(:photo_id => photo.id).each do |like| %>
+           <small> <%= like.user.username %> liked this</small>
+           <% end %>
+          
+      <!--- unlike/like button -->
+          
+          <% if photo.likes.pluck(:user_id).include?(current_user.id) %>
+              <a href="/delete_like/<%= Like.find_by(:user_id => current_user.id, :photo_id => photo.id).id %>" class="btn btn-link pull-right">
+              <i class="fa fa-fw fa-heart"></i>Unlike</a>
+          
+          
+          
+          <% else %>
+          
+          <form action="/create_like" method="post">
+            <!-- Hidden input for authenticity token to protect from forgery -->
+                <input name="authenticity_token" type="hidden" value="EFtRg2ixCFoXZkJ9DC/IiOLQx5tPw+N2MaZcLu4t5CHuFZJaE6K1GIV7xnKlCSUVcNoxshgSO2vLOoQt0npt3A==">
+                <input type="hidden" name="photo_id" value="<%= photo.id %>">
+                <input type="hidden" name="user_id" value="<%= current_user.id %>">
+              
+  
+                <button class="btn btn-link pull-right"><i class="fa fa-fw fa-heart-o"></i>Like</button>
+              </form></p>
+          
+          <% end %>
+        
         <!--- where the comments start -->
         <% Comment.where(:photo_id => photo.id).each do |comment| %>
         <ul class="media-list">
@@ -79,7 +92,7 @@
           
           <!-- New comment form -->
           
-          <li class="media">
+          <div class="media">
             <div class="media-body">
               <form action="/create_comment" method="post">
                 <!-- Hidden input for authenticity token to protect from forgery -->
@@ -87,7 +100,7 @@
 
                 <input type="hidden" name="photo_id" value="<%= photo.id %>">
 
-                <input type="hidden" name="user_id" value="<%= photo.user.id %>">
+                <input type="hidden" name="user_id" value="<%= current_user.id %>">
 
                 <!-- Label and input for body -->
                 <div class="form-group">
